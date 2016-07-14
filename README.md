@@ -104,6 +104,20 @@ Default: `5`
 
 Maximum number of Karma servers that can be active at the same time. They run on ports subsequent to the configured Karma port, e.g. by default, Karma servers can be started on ports: `12111`, `12112`, `12113`, `12114`, and `12115`; the next server will then be started on port `12111` again.
 
+##### options.karma.waitForServerTime
+_optional_
+Type: `Number`
+Default: `10`
+
+Maximum time (in _seconds_) to wait for a Karma server to start up.
+
+##### options.karma.waitForRunnerTime
+_optional_
+Type: `Number`
+Default: `2`
+
+Maximum time (in _seconds_) a single test run may take. Used to detect if the mutated code does not end up in an inifinite loop, but may trigger false positives because of this. If, under normal circumstances, your tests already take around 2 seconds to run, you should increase this property accordingly.
+
 ##### options.mocha
 _optional_
 Type: `Object`
@@ -125,7 +139,7 @@ _optional_
 Type: `Object`
 Default: `{ console: true }`
 
-Configuration of reporters to use. Available options: `console`, `text`, `html`.
+Configuration of reporters to use. Available options: `console`, `text`, `html`, `json`.
 
 ##### options.reporters.text.dir
 _optional_
@@ -144,7 +158,7 @@ Filename of the text report.
 ##### options.reporters.html.dir
 _optional_
 Type: `String`
-Default: `"reports/grunt-mutation-testing"`
+Default: `"reports/grunt-mutation-testing/html"`
 
 Directory to place the HTML report in.
 
@@ -154,6 +168,20 @@ Type: `Number`
 Default: `80`
 
 Percentage of mutations that should be killed in order for a test result to be considered successful.
+
+##### options.reporters.json.dir
+_optional_
+Type: `String`
+Default: `"reports/grunt-mutation-testing/json"`
+
+Directory to place the JSON report in.
+
+##### options.reporters.json.file
+_optional_
+Type: `String`
+Default: `mutations.json`
+
+Filename of the JSON report.
 
 ##### options.maxReportedMutationLength
 _optional_
@@ -288,6 +316,16 @@ grunt.initConfig({
 });
 ```
 
+## Troubleshooting
+In this section, you can find an overview of the most common errors you may encounter.
+
+### Tests fail without mutations
+When you get the 'Tests fail without mutations [...]' error, it is most likely that something is wrong with your configuration. Usually, this means that something is wrong in the `code`, `specs`, `mutate` part. You should check if `code` really points to all your source files _and the libraries you need_, and if the paths to `specs` and `mutate` follow the correct base path. For more information on these options, check the [Options](#options) section above.
+
+### Infinite loop detected
+Whereas usually, this means a mutation caused your code to enter an infinite loop (from which it cannot recover), it can also mean that the default timeout setting is too short for your tests to finish. You can test this by modifying the `options.karma.waitForRunnerTime` config property, by which you set the maximum duration of a single test run (in _seconds_).
+
+
 ## Available mutations
 Currently, the following mutations are available:
 
@@ -349,6 +387,13 @@ All javascript comment types are supported, i.e. one can use both `// @excludeMu
 In lieu of a formal style guide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
+
+### v 1.4.1
+- Added notIncluded option for Karma (thanks @divido):
+  - Fixes \#60, Not possible to exclude files in Karma config.
+
+### v 1.4.0
+- Added JSON reporter.
 
 ### v 1.3.2
 - Fixed misleading configuration error message when paths could not be resolved.
